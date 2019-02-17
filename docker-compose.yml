@@ -1,0 +1,44 @@
+version: '3'
+services:
+  app:
+    environment: 
+      - BUNDLE_PATH=/gems
+      - SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
+      - SHOPIFY_SECRET=${SHOPIFY_SECRET}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SHOPIFY_PRICE=${SHOPIFY_PRICE}
+      - SHOPIFY_APP_NAME=${SHOPIFY_APP_NAME}
+    depends_on:
+      - db
+      - redis
+      - sidekiq
+    build: .
+    volumes:
+      - gems:/gems
+  db:
+    image: postgres:10
+    volumes:
+      - db-store:/var/lib/postgresql/data
+  redis:
+    image: redis
+  sidekiq:
+    build: .
+    volumes:
+      - gems:/gems
+    depends_on:
+      - redis
+      - db
+    entrypoint:
+      - bundle
+      - exec
+      - sidekiq
+    environment: 
+      - BUNDLE_PATH=/gems
+      - SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
+      - SHOPIFY_SECRET=${SHOPIFY_SECRET}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SHOPIFY_PRICE=${SHOPIFY_PRICE}
+      - SHOPIFY_APP_NAME=${SHOPIFY_APP_NAME}
+volumes:
+  db-store:
+  gems:

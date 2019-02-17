@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <% application_name = ShopifyApp.configuration.application_name %>
+    <title><%= application_name %></title>
+    <%= action_cable_meta_tag %>
+    <%= javascript_include_tag 'application' %>
+    <%= javascript_pack_tag 'application' %>
+    <%= stylesheet_link_tag 'application' %>
+    <link rel="stylesheet" href="https://unpkg.com/react-vis/dist/style.css">
+    <link
+      rel="stylesheet"
+      href="//cdn.jsdelivr.net/npm/semantic-ui@2.4.1/dist/semantic.min.css"
+    />
+    <%# <%= stylesheet_pack_tag 'application' %>
+    <%= csrf_meta_tags %>
+  </head>
+
+  <body>
+    <div class="app-wrapper">
+      <div class="app-content">
+        <main role="main">
+          <%= yield %>
+        </main>
+      </div>
+    </div>
+
+    <%= render 'layouts/flash_messages' %>
+
+    <script src="https://cdn.shopify.com/s/assets/external/app.js?<%= Time.now.strftime('%Y%m%d%H') %>"></script>
+
+    <script type="text/javascript">
+      ShopifyApp.init({
+        apiKey: "<%= ShopifyApp.configuration.api_key %>",
+        shopOrigin: "<%= "https://#{ @shop_session.url }" if @shop_session %>",
+        debug: <%= Rails.env.development? ? 'true' : 'false' %>,
+        forceRedirect: true
+      });
+    </script>
+
+    <% if content_for?(:javascript) %>
+      <div id="ContentForJavascript" data-turbolinks-temporary>
+        <%= yield :javascript %>
+      </div>
+    <% end %>
+  </body>
+</html>

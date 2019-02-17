@@ -1,0 +1,26 @@
+version: '3'
+services:
+  app:
+    environment:
+      - RAILS_ENV=production
+      - VIRTUAL_HOST=channelize.kenforthewin.com
+      - LETSENCRYPT_HOST=channelize.kenforthewin.com
+      - LETSENCRYPT_EMAIL=bergquist.kenneth@gmail.com
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - RAILS_SERVE_STATIC_FILES=${RAILS_SERVE_STATIC_FILES}
+  sidekiq:
+    environment:
+      - RAILS_ENV=production
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+  db:
+    image: gcr.io/cloudsql-docker/gce-proxy:1.11
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - $PWD/cloudsql:/cloudsql
+      - $PWD/db-key.json:/config
+    command:
+      - /cloud_sql_proxy
+      - -instances=react-rails-auth:us-central1:scalr=tcp:0.0.0.0:5432
+      - -credential_file=/config
